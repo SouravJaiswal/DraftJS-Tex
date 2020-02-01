@@ -96,7 +96,7 @@ let newEditorState = EditorState.push(
         });
       }
     }
-    console.log("Latex:", latex);
+    //console.log("Latex:", latex);
     const entityKey = editorState
       .getCurrentContent()
       .createEntity('INLINEMATH', 'MUTABLE', {

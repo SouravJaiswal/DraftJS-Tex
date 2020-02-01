@@ -19,7 +19,7 @@ export function findInlineBlock(contentBlock, callback, contentState) {
 export class LatexInlineBlock extends React.Component {
     constructor(props) {
         super(props);
-        console.log("Inline Block:", props);
+        //console.log("Inline Block:", props);
         const math = this.props.contentState.getEntity(this.props.entityKey).getData().content;
         this.state = {
             math
@@ -33,7 +33,7 @@ export class LatexInlineBlock extends React.Component {
         if (!latex) {
             return;
         }
-        console.log(this.props);
+        //console.log(this.props);
         const { editorState } = this.props;
         debugger;
         const entityKey = this.props.entityKey;
@@ -64,7 +64,9 @@ export class LatexInlineBlock extends React.Component {
     render() {
         //console.log(this.state.math);
         return (
-            <span onClick={this.onClick}><InlineMath readonly contentEditable="false" math={this.state.math} /></span>
+            <span onClick={this.onClick} readOnly contentEditable="false" suppressContentEditableWarning={true}>
+                <InlineMath math={this.state.math} />
+            </span>
         );
     }
 }

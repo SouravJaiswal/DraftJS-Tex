@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { EditorState, convertToRaw, convertFromHTML, ContentBlock, RichUtils } from 'draft-js';
+import { EditorState, convertToRaw, ContentBlock, RichUtils } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 import draftToHtml from 'draftjs-to-html';
 import '../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
@@ -7,6 +7,9 @@ import LatexToolbarOption from './LatexToolbarOption';
 import LatexInlineToolbarOption from './LatexInlineToolbarOption';
 import LatexBlock from './LatexBlock'
 import { findInlineBlock, LatexInlineBlock } from './LatexInlineBlock';
+import {convertToHTML, convertFromHTML } from 'draft-convert';
+import { InlineMath } from 'react-katex';
+
 /*
     const rawState = convertToRaw(editorState.getCurrentContent());
     console.log(draftToHtml);
@@ -20,13 +23,70 @@ import { findInlineBlock, LatexInlineBlock } from './LatexInlineBlock';
      
     */
 
+
+
+function LatexToHtml (entity, text) {
+  console.log("Entity:", entity, "Text:", text);
+  if (entity.type === 'INLINEMATH'){
+    return `<latex math="${entity.data.content}">${entity.data.content}</latex>`;
+  }else if (entity.type === 'BLOCKMATH'){
+    return `<blocklatex math="${entity.data.content}">${entity.data.content}</blocklatex>`;
+  }
+}
+
+function htmlToBlock(nodeName, node){
+  console.log("NodeName1:", nodeName, "Node1:", node);
+  if(nodeName === "blocklatex"){
+    return {type: 'atomic', data: { content: node.innerText}}
+  }
+}
+
+function HTMLtoLatex (nodeName, node, createEntity) {
+  console.log("NodeName:", nodeName, "Node:", node);
+   if (nodeName === "latex") {
+    return createEntity(
+      'INLINEMATH', 'MUTABLE', {
+        content: node.innerText
+      }
+    )
+  }else if (nodeName === "blocklatex") {
+    return createEntity(
+      'BLOCKMATH', 'MUTABLE', {
+        content: node.innerText
+      }
+    )
+  }
+}
 class EditorLatex extends Component {
   constructor(props) {
     super(props);
+    this.default = '<p>aesrdghfgjh<latex math="adfsghfgjh">adfsghfgjh</latex> fghj,&nbsp;</p><blocklatex math="dfjgkh">dfjgkh</blocklatex><p></p>';
+    this.contentState2 = convertFromHTML({htmlToEntity: HTMLtoLatex, htmlToBlock})(this.default);
     this.state = {
-      editorState: EditorState.createEmpty(),
+      editorState: EditorState.createWithContent(this.contentState2),
       text: 1
     };
+  }
+
+  blockToHTML = (block) => {
+    debugger;
+    console.log("Block:", block.type);
+    if (block.type === 'atomic'){
+      const contentState = this.state.editorState.getCurrentContent();
+      //console.log("ContentState:", contentState);
+      let entity = contentState.getBlockForKey(block.key);
+      entity = entity.getEntityAt(0);
+      //console.log("Entity:", entity);
+      if (entity) {
+        switch (entity.type) {
+          case 'BLOCKMATH':
+            return <blocklatex></blocklatex>;
+          default:
+            return ;
+        }
+      }
+      
+    }
   }
 
   blockRenderer = (block, config, editorState) => {
@@ -62,10 +122,13 @@ class EditorLatex extends Component {
     this.setState({
       editorState,
     });
+    const rawState = convertToRaw(editorState.getCurrentContent());
+    console.log("HTML:", draftToHtml(rawState, null, null,LatexToHtml));
+    console.log()
   };
 
   _handleKeyCommand = (command, editorState) => {
-    console.log(command);
+    //console.log(command);
     var newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
       this.onEditorStateChange(newState);

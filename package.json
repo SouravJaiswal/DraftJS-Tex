@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^7.1.2",
     "draft-js": "^0.11.4",
     "draftjs-to-html": "^0.9.1",
+    "draftjs-utils": "^0.10.2",
     "immutable": "^4.0.0-rc.12",
     "katex": "^0.11.1",
     "react": "^16.12.0",

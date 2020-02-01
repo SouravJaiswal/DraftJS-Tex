@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { EditorState, Modifier, AtomicBlockUtils, } from 'draft-js';
-import {InlineMath, BlockMath} from 'react-katex';
+import { InlineMath, BlockMath } from 'react-katex';
 
 
 class LatexToolbarOption extends Component {
@@ -13,20 +13,20 @@ class LatexToolbarOption extends Component {
   addStar: Function = (): void => {
     const { editorState, onChange } = this.props;
     const latex = window.prompt("Enter the formula: ");
-    if (!latex){
+    if (!latex) {
       return;
     }
     const contentState = editorState.getCurrentContent();
     const nextFormula = latex;
     const contentStateWithEntity = contentState.createEntity(
-      'TOKEN',
+      'BLOCKMATH',
       'IMMUTABLE',
-      {content: nextFormula},
+      { content: nextFormula },
     );
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
     const newEditorState = EditorState.set(
       editorState,
-      {currentContent: contentStateWithEntity},
+      { currentContent: contentStateWithEntity },
     );
 
     return onChange(AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' '));
@@ -40,23 +40,3 @@ class LatexToolbarOption extends Component {
 }
 
 export default LatexToolbarOption;
-
-
-
-function insertTeXBlock() {
-  const { editorState, onChange } = this.props;
-  const latex = window.prompt("Enter the formula: ");
-  const contentState = editorState.getCurrentContent();
-  const nextFormula = latex;
-  const contentStateWithEntity = contentState.createEntity(
-    'TOKEN',
-    'IMMUTABLE',
-    {content: nextFormula},
-  );
-  const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-  const newEditorState = EditorState.set(
-    editorState,
-    {currentContent: contentStateWithEntity},
-  );
-  return AtomicBlockUtils.insertAtomicBlock(newEditorState, entityKey, ' ');
-}
